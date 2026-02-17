@@ -1,0 +1,10 @@
+{
+  "name": "balance-inquiry-server",
+  "version": "1.0.0",
+  "description": "Backend server on port 8000 for agent access",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  }
+}
