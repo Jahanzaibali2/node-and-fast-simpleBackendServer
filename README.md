@@ -1,32 +1,70 @@
-# Balance Inquiry Server
+# Balance Inquiry API
 
-Backend server on **port 8000** that accepts parameters and is reachable by agents.
+FastAPI backend on **port 8000**. Send an account number, get the balance. Unknown accounts return 404.
+
+## Setup
+
+```bash
+cd BalanceInquiryTest
+python -m venv venv
+venv\Scripts\activate          # Windows
+# source venv/bin/activate      # macOS/Linux
+pip install -r requirements.txt
+```
 
 ## Run
 
 ```bash
-npm start
+python main.py
 ```
 
-Or: `node server.js`
+Server runs at **http://localhost:8000**. Open **http://localhost:8000/docs** for Swagger UI.
 
 ## Endpoints
 
-- **GET** `http://localhost:8000?param1=value1&param2=value2`  
-  Query parameters are echoed in the JSON response.
+| Method | Endpoint            | Description                    |
+|--------|---------------------|--------------------------------|
+| GET    | `/balance-inquiry`  | Get balance (query: `account_number`) |
+| POST   | `/balance-inquiry`  | Get balance (body: `{"account_number": "..."}`) |
 
-- **POST** `http://localhost:8000`  
-  Accepts parameters in the query string and/or JSON body.  
-  Example body: `{"key": "value"}`
+**Success (200)** — known account:
+```json
+{
+  "account_number": "1234567",
+  "amount": 50000,
+  "currency": "Rs"
+}
+```
 
-CORS is enabled so requests from other origins (e.g. browser or agent) are allowed.
+**Not found (404)** — unknown account:
+```json
+{
+  "detail": "Account number does not exist"
+}
+```
 
-## Example (agent or curl)
+## Test data
+
+- **1234567** → balance **50,000 Rs**
+- Any other account number → 404
+
+## Examples
 
 ```bash
-# GET with parameters
-curl "http://localhost:8000?action=balance&id=123"
+# GET
+curl "http://localhost:8000/balance-inquiry?account_number=1234567"
 
-# POST with JSON body
-curl -X POST http://localhost:8000 -H "Content-Type: application/json" -d "{\"action\":\"inquiry\",\"account\":\"ACC001\"}"
+# POST
+curl -X POST http://localhost:8000/balance-inquiry -H "Content-Type: application/json" -d "{\"account_number\": \"1234567\"}"
 ```
+
+Or use **http://localhost:8000/docs** and try the endpoints there.
+
+## Project layout
+
+- `main.py` — FastAPI app and balance logic
+- `requirements.txt` — Python dependencies
+- `test_api.py` — Script to test the API (run with server up)
+- `server.js` / `package.json` — Optional Node server (not required for the API above)
+
+CORS is enabled so the API can be called from browsers and other origins.
